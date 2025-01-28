@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Wallet base -->
+  <rect x="20" y="40" width="160" height="120" rx="10" fill="#4F46E5"/>
+  <!-- Digital circuit lines -->
+  <path d="M40 100 H80 V70 H120 V130 H160" stroke="#ffffff" stroke-width="4" fill="none"/>
+  <circle cx="40" cy="100" r="4" fill="#ffffff"/>
+  <circle cx="80" cy="70" r="4" fill="#ffffff"/>
+  <circle cx="120" cy="70" r="4" fill="#ffffff"/>
+  <circle cx="120" cy="130" r="4" fill="#ffffff"/>
+  <circle cx="160" cy="130" r="4" fill="#ffffff"/>
+  <!-- Card slot -->
+  <rect x="140" y="80" width="40" height="5" fill="#ffffff"/>
+</svg>

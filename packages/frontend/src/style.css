@@ -1,0 +1,32 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+}
+
+.transaction-pending {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+}
+
+.transaction-completed {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+}
+
+.transaction-failed {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+}
+
+.amount-deposit {
+  color: #198754;
+}
+
+.amount-withdrawal {
+  color: #dc3545;
+}
