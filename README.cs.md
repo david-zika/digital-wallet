@@ -301,6 +301,16 @@ VITE_API_URL=http://localhost:8080/api
 
 ### Docker nasazení
 
+0. Nastavte proměnné prostředí v docker-compose.yml:
+
+*  POSTGRES_DB
+*  POSTGRES_USER
+*  POSTGRES_PASSWORD
+
+*  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_NAME
+*  SPRING_DATASOURCE_USERNAME
+*  SPRING_DATASOURCE_PASSWORD
+
 1. Sestavení obrazů:
    ```bash
    docker-compose build

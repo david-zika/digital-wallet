@@ -356,7 +356,17 @@ npm run dev
 
 ### Docker Deployment
 
-1. Build images:
+Set env variables in the docker-compose.yml:
+
+ *  POSTGRES_DB
+ *  POSTGRES_USER
+ *  POSTGRES_PASSWORD
+
+ *  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_NAME
+ *  SPRING_DATASOURCE_USERNAME
+ *  SPRING_DATASOURCE_PASSWORD
+ 
+Build images:
 ```bash
 docker-compose build
 ```
