@@ -17,20 +17,15 @@ export default defineConfig({
     },
   },
   build: {
-    target: 'es2015',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
-    rollupOptions: {
+    target: 'es2020',
+    minify: 'oxc',
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          'vendor': ['vue', 'pinia', 'vue-i18n'],
-          'wallet': ['decimal.js', 'qrcode.vue', 'date-fns'],
-          'ui': ['bootstrap'],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (['vue', 'pinia', 'vue-i18n'].some((pkg) => id.includes(`/${pkg}/`))) return 'vendor'
+          if (['decimal.js', 'qrcode.vue', 'date-fns'].some((pkg) => id.includes(`/${pkg}/`))) return 'wallet'
+          if (id.includes('/bootstrap/')) return 'ui'
         },
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
