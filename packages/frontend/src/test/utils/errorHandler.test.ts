@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
-import { useErrorHandler } from '@/utils/errorHandler'
+import { useErrorHandler } from '@/shared/utils/errorHandler'
 
 // Mock i18n
-vi.mock('@/i18n', () => ({
+vi.mock('@/core/i18n', () => ({
   i18n: {
     global: {
       t: (key: string) => key,

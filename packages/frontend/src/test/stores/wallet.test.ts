@@ -1,8 +1,8 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useWalletStore } from '@/stores/wallet'
+import { useWalletStore } from '@/features/wallet/stores/wallet'
 
-vi.mock('@/services/api', () => ({
+vi.mock('@/core/services/api', () => ({
   wallet: {
     getBalances: vi.fn(),
     getTransactions: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock('@/services/api', () => ({
   },
 }))
 
-import { wallet as walletApi } from '@/services/api'
+import { wallet as walletApi } from '@/core/services/api'
 
 const mockBalances = [
   { currency: 'EUR', balance: 1000.0, lastUpdated: '2026-01-01T00:00:00Z' },

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import router from '@/router'
-import { useAuthStore } from '@/stores/auth'
-import { useWalletStore } from '@/stores/wallet'
+import router from '@/core/router'
+import { useAuthStore } from '@/features/auth/stores/auth'
+import { useWalletStore } from '@/features/wallet/stores/wallet'
 import logo from './assets/logo.svg'
 import Footer from './components/Footer.vue'
 import LanguageSelector from './components/LanguageSelector.vue'
@@ -65,17 +65,7 @@ function logout() {
   </div>
 </template>
 
-<style>
-  .min-vh-100 {
-    min-height: 100vh;
-  }
-
-  .flex-grow-1 {
-    flex-grow: 1;
-  }
-</style>
-
-<style scoped>
+<style scoped lang="scss">
   .logo {
     height: 60px;
     width: auto;

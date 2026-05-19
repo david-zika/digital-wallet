@@ -1,9 +1,9 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/features/auth/stores/auth'
 
 // Mock API modulu
-vi.mock('@/services/api', () => ({
+vi.mock('@/core/services/api', () => ({
   auth: {
     login: vi.fn(),
     register: vi.fn(),
@@ -13,7 +13,7 @@ vi.mock('@/services/api', () => ({
   },
 }))
 
-import { auth as authApi } from '@/services/api'
+import { auth as authApi } from '@/core/services/api'
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
