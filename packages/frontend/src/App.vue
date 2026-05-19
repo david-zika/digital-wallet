@@ -1,28 +1,28 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
-  import { useAuthStore } from '@/stores/auth';
-  import { useWalletStore } from '@/stores/wallet';
-  import LanguageSelector from './components/LanguageSelector.vue';
-  import UserInfo from './components/UserInfo.vue';
-  import Footer from './components/Footer.vue';
-  import NotificationList from './components/NotificationList.vue';
-  import logo from './assets/logo.svg';
-  import router from '@/router';
-  import LoadingSpinner from './components/LoadingSpinner.vue';
+import { onMounted } from 'vue'
+import router from '@/router'
+import { useAuthStore } from '@/stores/auth'
+import { useWalletStore } from '@/stores/wallet'
+import logo from './assets/logo.svg'
+import Footer from './components/Footer.vue'
+import LanguageSelector from './components/LanguageSelector.vue'
+import LoadingSpinner from './components/LoadingSpinner.vue'
+import NotificationList from './components/NotificationList.vue'
+import UserInfo from './components/UserInfo.vue'
 
-  const authStore = useAuthStore();
-  const walletStore = useWalletStore();
+const authStore = useAuthStore()
+const walletStore = useWalletStore()
 
-  onMounted(() => {
-    if (authStore.isAuthenticated && !walletStore.isInitialized) {
-      walletStore.initialize();
-    }
-  });
-
-  function logout() {
-    authStore.logout();
-    router.push('/login');
+onMounted(() => {
+  if (authStore.isAuthenticated && !walletStore.isInitialized) {
+    walletStore.initialize()
   }
+})
+
+function logout() {
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -51,7 +51,9 @@
     <main class="container pb-4 flex-grow-1">
       <router-view v-slot="{ Component }">
         <Suspense>
-          <component :is="Component" />
+          <template #default>
+            <component :is="Component" v-if="Component" />
+          </template>
           <template #fallback>
             <LoadingSpinner />
           </template>

@@ -1,16 +1,21 @@
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n';
-  import 'flag-icons/css/flag-icons.min.css';
+import { useI18n } from 'vue-i18n'
+import 'flag-icons/css/flag-icons.min.css'
 
-  const { locale } = useI18n();
+const { locale } = useI18n()
 
-  const languages = [
-    { code: 'en', flag: 'gb', name: 'English' },
-    { code: 'cs', flag: 'cz', name: 'Čeština' },
-    { code: 'sk', flag: 'sk', name: 'Slovenčina' },
-    { code: 'es', flag: 'es', name: 'Español' },
-    { code: 'de', flag: 'de', name: 'Deutsch' },
-  ];
+const languages = [
+  { code: 'en', flag: 'gb', name: 'English' },
+  { code: 'cs', flag: 'cz', name: 'Čeština' },
+  { code: 'sk', flag: 'sk', name: 'Slovenčina' },
+  { code: 'es', flag: 'es', name: 'Español' },
+  { code: 'de', flag: 'de', name: 'Deutsch' },
+]
+
+function setLocale(code: string) {
+  locale.value = code
+  localStorage.setItem('app-locale', code)
+}
 </script>
 
 <template>
@@ -25,7 +30,7 @@
           class="dropdown-item"
           href="#"
           :class="{ active: locale === lang.code }"
-          @click.prevent="locale = lang.code"
+          @click.prevent="setLocale(lang.code)"
         >
           <span :class="`fi fi-${lang.flag}`" class="me-2"></span>
           {{ lang.name }}

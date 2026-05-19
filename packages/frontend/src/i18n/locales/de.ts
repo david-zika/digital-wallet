@@ -146,4 +146,4 @@ export default {
       transferCreated: 'Überweisung erfolgreich erstellt',
     },
   },
-};
+}

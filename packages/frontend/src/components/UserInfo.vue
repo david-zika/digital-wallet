@@ -1,26 +1,26 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import { useAuthStore } from '@/stores/auth';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
-  const authStore = useAuthStore();
-  const { t } = useI18n();
-  const router = useRouter();
+const authStore = useAuthStore()
+const { t } = useI18n()
+const router = useRouter()
 
-  const userEmail = computed(() => authStore.userEmail || '');
-  const accountReference = computed(() => authStore.accountReference);
-  const fullName = computed(() => authStore.profile?.fullName || '');
+const userEmail = computed(() => authStore.userEmail || '')
+const accountReference = computed(() => authStore.accountReference)
+const fullName = computed(() => authStore.profile?.fullName || '')
 
-  const isRouteSettings = computed(() => router.currentRoute.value.path === '/settings');
+const isRouteSettings = computed(() => router.currentRoute.value.path === '/settings')
 
-  const handleSettings = () => {
-    if (isRouteSettings.value) {
-      router.push('/');
-    } else {
-      router.push('/settings');
-    }
-  };
+const handleSettings = () => {
+  if (isRouteSettings.value) {
+    router.push('/')
+  } else {
+    router.push('/settings')
+  }
+}
 </script>
 
 <template>

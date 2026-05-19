@@ -1,0 +1,21 @@
+# ── Maven build output ────────────────────────────────────────────────────────
+target/
+
+# ── Maven wrapper ─────────────────────────────────────────────────────────────
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IntelliJ IDEA ─────────────────────────────────────────────────────────────
+*.iml
+*.iws
+*.ipr
+
+# ── Spring Boot devtools ──────────────────────────────────────────────────────
+spring-boot-devtools.properties
+

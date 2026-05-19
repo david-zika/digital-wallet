@@ -1,10 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 // Lazy-loaded components to prevent circular dependencies
-const LoginView = () => import('@/views/LoginView.vue');
-const WalletView = () => import('@/views/WalletView.vue');
-const SettingsView = () => import('@/views/SettingsView.vue');
+const LoginView = () => import('@/views/LoginView.vue')
+const WalletView = () => import('@/views/WalletView.vue')
+const SettingsView = () => import('@/views/SettingsView.vue')
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,21 +28,17 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
   ],
-});
+})
 
-// Navigation guard
-router.beforeEach((to, _from, next) => {
-  const authStore = useAuthStore();
+router.beforeEach((to, _from) => {
+  const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    // Přesměrování na login, pokud uživatel není přihlášen
-    next('/login');
-  } else if (to.path === '/login' && authStore.isAuthenticated) {
-    // Přesměrování na hlavní stránku, pokud je uživatel již přihlášen
-    next('/');
-  } else {
-    next();
+    return '/login'
   }
-});
+  if (to.path === '/login' && authStore.isAuthenticated) {
+    return '/'
+  }
+})
 
-export default router;
+export default router

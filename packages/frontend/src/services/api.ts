@@ -1,66 +1,64 @@
-import axios from 'axios';
-import { useErrorHandler } from '@/utils/errorHandler';
+import axios from 'axios'
+import { useErrorHandler } from '@/utils/errorHandler'
 
 const api = axios.create({
   baseURL: 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
 
-// Add auth token to all requests
 api.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token');
+  (config) => {
+    const token = localStorage.getItem('token')
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return config;
+    return config
   },
-  error => {
-    const { handleError } = useErrorHandler();
-    return Promise.reject(handleError(error));
+  (error) => {
+    const { handleError } = useErrorHandler()
+    return Promise.reject(handleError(error))
   }
-);
+)
 
-// Handle responses and errors
 api.interceptors.response.use(
-  response => {
+  (response) => {
     if (response.status >= 400) {
       if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('token');
-        window.location.href = '/';
+        localStorage.removeItem('token')
+        window.location.href = '/'
       }
 
-      return Promise.reject(response);
+      return Promise.reject(response)
     }
-    return response;
+    return response
   },
-  error => {
-    const { handleError } = useErrorHandler();
+  (error) => {
+    const { handleError } = useErrorHandler()
 
     if (error.response?.status === 401 || error.response?.status === 403) {
-      localStorage.removeItem('token');
-      window.location.href = '/';
+      localStorage.removeItem('token')
+      window.location.href = '/'
     }
-    return Promise.reject(handleError(error));
+    return Promise.reject(handleError(error))
   }
-);
+)
 
 interface TransactionFilters {
-  page?: number;
-  pageSize?: number;
-  amountFrom?: number;
-  amountTo?: number;
-  reference?: string;
-  type?: 'TRANSFER' | 'EXTERNAL';
+  page?: number
+  pageSize?: number
+  amountFrom?: number
+  amountTo?: number
+  reference?: string
+  type?: 'TRANSFER' | 'EXTERNAL'
 }
 
 interface Profile {
-  email: string;
-  accountReference: string;
-  fullName: string | null;
-  bankAccount: string | null;
+  email: string
+  accountReference: string
+  fullName: string | null
+  bankAccount: string | null
 }
 
 export const auth = {
@@ -75,7 +73,7 @@ export const auth = {
 
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     api.post('/auth/change-password', data),
-};
+}
 
 export const wallet = {
   getBalances: () => api.get('/wallet/balances'),
@@ -98,8 +96,7 @@ export const wallet = {
     type: string,
     recipientAccount?: string,
     recipientName?: string,
-    paymentReference?: string,
-    isDemoMode = false
+    paymentReference?: string
   ) =>
     api.post('/wallet/transactions', {
       amount,
@@ -108,8 +105,7 @@ export const wallet = {
       recipientAccount,
       recipientName,
       paymentReference,
-      isDemoMode,
     }),
-};
+}
 
-export default api;
+export default api

@@ -2,8 +2,8 @@ package com.example.wallet.service;
 
 import com.example.wallet.dto.ProfileResponse;
 import com.example.wallet.dto.UpdateProfileRequest;
-import com.example.wallet.exception.WalletErrorCode;
-import com.example.wallet.exception.WalletException;
+import com.example.exception.WalletErrorCode;
+import com.example.exception.WalletException;
 import com.example.wallet.model.User;
 import com.example.wallet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

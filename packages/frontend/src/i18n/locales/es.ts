@@ -144,4 +144,4 @@ export default {
       transferCreated: 'Transferencia creada exitosamente',
     },
   },
-};
+}

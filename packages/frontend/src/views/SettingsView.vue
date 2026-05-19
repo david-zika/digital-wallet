@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import ProfileForm from '@/components/ProfileForm.vue';
-  import ChangePasswordForm from '@/components/ChangePasswordForm.vue';
+import ChangePasswordForm from '@/components/ChangePasswordForm.vue'
+import ProfileForm from '@/components/ProfileForm.vue'
 </script>
 
 <template>

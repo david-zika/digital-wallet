@@ -1,47 +1,47 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { useAuthStore } from '@/stores/auth';
-  import { useNotificationStore } from '@/stores/notification';
-  import { useI18n } from 'vue-i18n';
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 
-  const authStore = useAuthStore();
-  const notificationStore = useNotificationStore();
-  const { t } = useI18n();
+const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
+const { t } = useI18n()
 
-  const currentPassword = ref('');
-  const newPassword = ref('');
-  const confirmPassword = ref('');
-  const error = ref('');
-  const isLoading = ref(false);
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const error = ref('')
+const isLoading = ref(false)
 
-  const handleSubmit = async () => {
-    if (isLoading.value) return;
+const handleSubmit = async () => {
+  if (isLoading.value) return
 
-    try {
-      error.value = '';
-      isLoading.value = true;
+  try {
+    error.value = ''
+    isLoading.value = true
 
-      if (newPassword.value !== confirmPassword.value) {
-        throw new Error(t('auth.passwordsDoNotMatch'));
-      }
-
-      if (newPassword.value.length < 6) {
-        throw new Error(t('auth.passwordTooShort'));
-      }
-
-      await authStore.changePassword(currentPassword.value, newPassword.value);
-
-      notificationStore.addNotification(t('notifications.success.passwordChanged'));
-
-      currentPassword.value = '';
-      newPassword.value = '';
-      confirmPassword.value = '';
-    } catch (err: unknown) {
-      error.value = err?.toString()!;
-    } finally {
-      isLoading.value = false;
+    if (newPassword.value !== confirmPassword.value) {
+      throw new Error(t('auth.passwordsDoNotMatch'))
     }
-  };
+
+    if (newPassword.value.length < 6) {
+      throw new Error(t('auth.passwordTooShort'))
+    }
+
+    await authStore.changePassword(currentPassword.value, newPassword.value)
+
+    notificationStore.addNotification(t('notifications.success.passwordChanged'))
+
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+  } catch (err: unknown) {
+    error.value = String(err)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>

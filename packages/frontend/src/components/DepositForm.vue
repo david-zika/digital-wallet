@@ -1,73 +1,72 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { useWalletStore } from '@/stores/wallet';
-  import { useNotificationStore } from '@/stores/notification';
-  import { useI18n } from 'vue-i18n';
-  import QRCode from 'qrcode.vue';
-  import type { CZKInstructions, EURInstructions, PaymentInstructions } from '@/types/wallet';
+import QRCode from 'qrcode.vue'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useNotificationStore } from '@/stores/notification'
+import { useWalletStore } from '@/stores/wallet'
+import type { CZKInstructions, EURInstructions, PaymentInstructions } from '@/types/wallet'
 
-  const walletStore = useWalletStore();
-  const notificationStore = useNotificationStore();
-  const { t } = useI18n();
+const walletStore = useWalletStore()
+const notificationStore = useNotificationStore()
+const { t } = useI18n()
 
-  const amount = ref('');
-  const currency = ref<'EUR' | 'CZK'>('EUR');
-  const demoMode = ref(false);
-  const error = ref('');
+const amount = ref('')
+const currency = ref<'EUR' | 'CZK'>('EUR')
+const demoMode = ref(false)
+const error = ref('')
 
-  const getPaymentInstructions = () => {
-    if (!amount.value || demoMode.value) return null;
+const getPaymentInstructions = () => {
+  if (!amount.value || demoMode.value) return null
 
-    const instructions: PaymentInstructions = {
-      EUR: {
-        IBAN: 'CZ1234567890123456789012',
-        SWIFT: 'GIBACZPX',
-        Bank: 'Example Bank',
-      },
-      CZK: {
-        AccountNumber: '123456789/0100',
-        Bank: 'Example Bank',
-      },
-    };
+  const instructions: PaymentInstructions = {
+    EUR: {
+      IBAN: 'CZ1234567890123456789012',
+      SWIFT: 'GIBACZPX',
+      Bank: 'Example Bank',
+    },
+    CZK: {
+      AccountNumber: '123456789/0100',
+      Bank: 'Example Bank',
+    },
+  }
 
-    return instructions[currency.value];
-  };
+  return instructions[currency.value]
+}
 
-  const getQRValue = () => {
-    if (!amount.value || demoMode.value) return '';
-    const instructions = getPaymentInstructions();
-    return JSON.stringify({
-      amount: amount.value,
-      currency: currency.value,
-      ...instructions,
-    });
-  };
+const getQRValue = () => {
+  if (!amount.value || demoMode.value) return ''
+  const instructions = getPaymentInstructions()
+  return JSON.stringify({
+    amount: amount.value,
+    currency: currency.value,
+    ...instructions,
+  })
+}
 
-  const handleSubmit = async () => {
-    try {
-      error.value = '';
-      const amountNum = parseFloat(amount.value);
+const handleSubmit = async () => {
+  try {
+    error.value = ''
+    const amountNum = parseFloat(amount.value)
 
-      if (isNaN(amountNum) || amountNum <= 0) {
-        throw new Error(t('wallet.deposit.invalidAmount'));
-      }
-
-      await walletStore.createTransaction(
-        amountNum,
-        currency.value,
-        'DEPOSIT',
-        undefined,
-        undefined,
-        undefined,
-        demoMode.value
-      );
-
-      notificationStore.addNotification(t('notifications.success.depositCreated'));
-      amount.value = '';
-    } catch (err: unknown) {
-      error.value = err?.toString()!;
+    if (Number.isNaN(amountNum) || amountNum <= 0) {
+      throw new Error(t('wallet.deposit.invalidAmount'))
     }
-  };
+
+    await walletStore.createTransaction(
+      amountNum,
+      currency.value,
+      'DEPOSIT',
+      undefined,
+      undefined,
+      undefined
+    )
+
+    notificationStore.addNotification(t('notifications.success.depositCreated'))
+    amount.value = ''
+  } catch (err: unknown) {
+    error.value = String(err)
+  }
+}
 </script>
 
 <template>

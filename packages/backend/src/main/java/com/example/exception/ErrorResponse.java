@@ -1,4 +1,4 @@
-package com.example.wallet.exception;
+package com.example.exception;
 
 import lombok.Data;
 

@@ -1,50 +1,51 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { useAuthStore } from '@/stores/auth';
-  import { useNotificationStore } from '@/stores/notification';
-  import { useI18n } from 'vue-i18n';
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 
-  const authStore = useAuthStore();
-  const notificationStore = useNotificationStore();
-  const { t } = useI18n();
+const router = useRouter()
+const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
+const { t } = useI18n()
 
-  const email = ref('');
-  const password = ref('');
-  const fullName = ref('');
-  const isRegistering = ref(false);
-  const error = ref('');
-  const isLoading = ref(false);
+const email = ref('')
+const password = ref('')
+const fullName = ref('')
+const isRegistering = ref(false)
+const error = ref('')
+const isLoading = ref(false)
 
-  const handleSubmit = async () => {
-    if (isLoading.value) return;
+const handleSubmit = async () => {
+  if (isLoading.value) return
 
-    try {
-      isLoading.value = true;
-      error.value = '';
+  try {
+    isLoading.value = true
+    error.value = ''
 
-      if (isRegistering.value) {
-        if (!fullName.value) {
-          throw new Error(t('auth.fullNameRequired'));
-        }
-        await authStore.register(email.value, password.value, fullName.value);
-        notificationStore.addNotification(t('notifications.success.register'));
-      } else {
-        await authStore.login(email.value, password.value);
-        notificationStore.addNotification(t('notifications.success.login'));
+    if (isRegistering.value) {
+      if (!fullName.value) {
+        throw new Error(t('auth.fullNameRequired'))
       }
-
-      // Reset form after successful submission
-      email.value = '';
-      password.value = '';
-      fullName.value = '';
-
-      router.push('/');
-    } catch (err: unknown) {
-      error.value = err?.toString()!;
-    } finally {
-      isLoading.value = false;
+      await authStore.register(email.value, password.value, fullName.value)
+      notificationStore.addNotification(t('notifications.success.register'))
+    } else {
+      await authStore.login(email.value, password.value)
+      notificationStore.addNotification(t('notifications.success.login'))
     }
-  };
+
+    email.value = ''
+    password.value = ''
+    fullName.value = ''
+
+    router.push('/')
+  } catch (err: unknown) {
+    error.value = String(err)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>

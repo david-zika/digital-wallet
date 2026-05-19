@@ -1,48 +1,48 @@
 <script setup lang="ts">
-  import { ref, onMounted, computed } from 'vue';
-  import { useAuthStore } from '@/stores/auth';
-  import { useNotificationStore } from '@/stores/notification';
-  import { useI18n } from 'vue-i18n';
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 
-  const authStore = useAuthStore();
-  const notificationStore = useNotificationStore();
-  const { t } = useI18n();
+const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
+const { t } = useI18n()
 
-  const fullName = ref('');
-  const bankAccount = ref('');
-  const error = ref('');
-  const isLoading = ref(false);
-  const userEmail = computed(() => authStore.userEmail || '');
+const fullName = ref('')
+const bankAccount = ref('')
+const error = ref('')
+const isLoading = ref(false)
+const userEmail = computed(() => authStore.userEmail || '')
 
-  onMounted(async () => {
-    try {
-      const profile = await authStore.getProfile();
-      fullName.value = profile.fullName || '';
-      bankAccount.value = profile.bankAccount || '';
-    } catch (err: unknown) {
-      error.value = err?.toString()!;
-    }
-  });
+onMounted(async () => {
+  try {
+    const profile = await authStore.getProfile()
+    fullName.value = profile.fullName || ''
+    bankAccount.value = profile.bankAccount || ''
+  } catch (err: unknown) {
+    error.value = String(err)
+  }
+})
 
-  const handleSubmit = async () => {
-    if (isLoading.value) return;
+const handleSubmit = async () => {
+  if (isLoading.value) return
 
-    try {
-      error.value = '';
-      isLoading.value = true;
+  try {
+    error.value = ''
+    isLoading.value = true
 
-      await authStore.updateProfile({
-        fullName: fullName.value,
-        bankAccount: bankAccount.value,
-      });
+    await authStore.updateProfile({
+      fullName: fullName.value,
+      bankAccount: bankAccount.value,
+    })
 
-      notificationStore.addNotification(t('notifications.success.profileUpdated'));
-    } catch (err: unknown) {
-      error.value = err?.toString()!;
-    } finally {
-      isLoading.value = false;
-    }
-  };
+    notificationStore.addNotification(t('notifications.success.profileUpdated'))
+  } catch (err: unknown) {
+    error.value = String(err)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>

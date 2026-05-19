@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -21,11 +23,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "AND ((:reference IS NULL OR :reference = '') OR LOWER(t.paymentReference) LIKE LOWER(CONCAT('%', :reference, '%')) OR LOWER(t.recipientAccount) LIKE LOWER(CONCAT('%', :reference, '%'))) " +
             "ORDER BY t.createdAt DESC")
     Page<Transaction> findTransactions(
-            @Param("userId") UUID userId,
-            @Param("type") String type,
-            @Param("amountFrom") BigDecimal amountFrom,
-            @Param("amountTo") BigDecimal amountTo,
-            @Param("reference") String reference,
-            Pageable pageable
+            @Param("userId") @NonNull UUID userId,
+            @Param("type") @Nullable String type,
+            @Param("amountFrom") @Nullable BigDecimal amountFrom,
+            @Param("amountTo") @Nullable BigDecimal amountTo,
+            @Param("reference") @Nullable String reference,
+            @NonNull Pageable pageable
     );
 }

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
-  import { useWalletStore } from '@/stores/wallet';
-  import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useWalletStore } from '@/stores/wallet'
 
-  const walletStore = useWalletStore();
-  const { t } = useI18n();
+const walletStore = useWalletStore()
+const { t } = useI18n()
 
-  onMounted(() => {
-    if (!walletStore.balances.length) {
-      walletStore.fetchBalances();
-    }
-  });
+onMounted(() => {
+  if (!walletStore.balances.length) {
+    walletStore.fetchBalances()
+  }
+})
 </script>
 
 <template>

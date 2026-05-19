@@ -1,90 +1,89 @@
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
-  import { useWalletStore } from '@/stores/wallet';
-  import { useAuthStore } from '@/stores/auth';
-  import { useNotificationStore } from '@/stores/notification';
-  import { useI18n } from 'vue-i18n';
-  import { useErrorHandler } from '@/utils/errorHandler';
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
+import { useWalletStore } from '@/stores/wallet'
+import { useErrorHandler } from '@/utils/errorHandler'
 
-  const walletStore = useWalletStore();
-  const authStore = useAuthStore();
-  const notificationStore = useNotificationStore();
-  const { t } = useI18n();
-  const { handleError } = useErrorHandler();
+const walletStore = useWalletStore()
+const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
+const { t } = useI18n()
+const { handleError } = useErrorHandler()
 
-  const amount = ref('');
-  const currency = ref<'EUR' | 'CZK'>('EUR');
-  const recipientAccount = ref('');
-  const recipientName = ref('');
-  const paymentReference = ref('');
-  const error = ref('');
-  const isLoading = ref(false);
-  const isInitialized = ref(false);
+const amount = ref('')
+const currency = ref<'EUR' | 'CZK'>('EUR')
+const recipientAccount = ref('')
+const recipientName = ref('')
+const paymentReference = ref('')
+const error = ref('')
+const isLoading = ref(false)
+const isInitialized = ref(false)
 
-  const currentBalance = computed(() => walletStore.getBalance(currency.value));
-  const isInsufficientBalance = computed(() => {
-    const amountNum = parseFloat(amount.value);
-    return !isNaN(amountNum) && amountNum > currentBalance.value;
-  });
+const currentBalance = computed(() => walletStore.getBalance(currency.value))
+const isInsufficientBalance = computed(() => {
+  const amountNum = parseFloat(amount.value)
+  return !Number.isNaN(amountNum) && amountNum > currentBalance.value
+})
 
-  onMounted(async () => {
-    try {
-      isLoading.value = true;
-      const profile = await authStore.getProfile();
-      recipientAccount.value = profile.bankAccount || '';
-      recipientName.value = profile.fullName || '';
-      isInitialized.value = true;
-    } catch (err) {
-      error.value = handleError(err);
-    } finally {
-      isLoading.value = false;
+onMounted(async () => {
+  try {
+    isLoading.value = true
+    const profile = await authStore.getProfile()
+    recipientAccount.value = profile.bankAccount || ''
+    recipientName.value = profile.fullName || ''
+    isInitialized.value = true
+  } catch (err) {
+    error.value = handleError(err)
+  } finally {
+    isLoading.value = false
+  }
+})
+
+const handleSubmit = async () => {
+  if (isLoading.value) return
+
+  try {
+    error.value = ''
+    isLoading.value = true
+    const amountNum = parseFloat(amount.value)
+
+    if (Number.isNaN(amountNum) || amountNum <= 0) {
+      throw new Error(t('wallet.withdraw.invalidAmount'))
     }
-  });
 
-  const handleSubmit = async () => {
-    if (isLoading.value) return;
-
-    try {
-      error.value = '';
-      isLoading.value = true;
-      const amountNum = parseFloat(amount.value);
-
-      if (isNaN(amountNum) || amountNum <= 0) {
-        throw new Error(t('wallet.withdraw.invalidAmount'));
-      }
-
-      if (isInsufficientBalance.value) {
-        throw new Error(t('wallet.withdraw.insufficientBalance'));
-      }
-
-      if (!recipientAccount.value) {
-        throw new Error(t('wallet.withdraw.noBankAccount'));
-      }
-
-      if (!recipientName.value) {
-        throw new Error(t('wallet.withdraw.recipientNameRequired'));
-      }
-
-      await walletStore.createTransaction(
-        amountNum,
-        currency.value,
-        'WITHDRAWAL',
-        recipientAccount.value ?? undefined,
-        recipientName.value ?? undefined,
-        paymentReference.value
-      );
-
-      notificationStore.addNotification(t('notifications.success.withdrawalCreated'));
-
-      // Reset form
-      amount.value = '';
-      paymentReference.value = '';
-    } catch (err: unknown) {
-      error.value = err?.toString()!;
-    } finally {
-      isLoading.value = false;
+    if (isInsufficientBalance.value) {
+      throw new Error(t('wallet.withdraw.insufficientBalance'))
     }
-  };
+
+    if (!recipientAccount.value) {
+      throw new Error(t('wallet.withdraw.noBankAccount'))
+    }
+
+    if (!recipientName.value) {
+      throw new Error(t('wallet.withdraw.recipientNameRequired'))
+    }
+
+    await walletStore.createTransaction(
+      amountNum,
+      currency.value,
+      'WITHDRAWAL',
+      recipientAccount.value ?? undefined,
+      recipientName.value ?? undefined,
+      paymentReference.value
+    )
+
+    notificationStore.addNotification(t('notifications.success.withdrawalCreated'))
+
+    amount.value = ''
+    paymentReference.value = ''
+  } catch (err: unknown) {
+    error.value = String(err)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>

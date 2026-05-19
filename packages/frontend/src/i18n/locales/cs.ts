@@ -144,4 +144,4 @@ export default {
       transferCreated: 'Převod byl úspěšně vytvořen',
     },
   },
-};
+}

@@ -1,65 +1,64 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
-  import { useWalletStore } from '@/stores/wallet';
-  import { useI18n } from 'vue-i18n';
-  import { useNotificationStore } from '@/stores/notification.ts';
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useNotificationStore } from '@/stores/notification.ts'
+import { useWalletStore } from '@/stores/wallet'
 
-  const notificationStore = useNotificationStore();
-  const walletStore = useWalletStore();
-  const { t } = useI18n();
+const notificationStore = useNotificationStore()
+const walletStore = useWalletStore()
+const { t } = useI18n()
 
-  const amount = ref('');
-  const currency = ref<'EUR' | 'CZK'>('EUR');
-  const recipientAccount = ref('');
-  const variableSymbol = ref('');
-  const error = ref('');
+const amount = ref('')
+const currency = ref<'EUR' | 'CZK'>('EUR')
+const recipientAccount = ref('')
+const variableSymbol = ref('')
+const error = ref('')
 
-  const currentBalance = computed(() => walletStore.getBalance(currency.value));
-  const isInsufficientBalance = computed(() => {
-    const amountNum = parseFloat(amount.value);
-    return !isNaN(amountNum) && amountNum > currentBalance.value;
-  });
+const currentBalance = computed(() => walletStore.getBalance(currency.value))
+const isInsufficientBalance = computed(() => {
+  const amountNum = parseFloat(amount.value)
+  return !Number.isNaN(amountNum) && amountNum > currentBalance.value
+})
 
-  const handleSubmit = async () => {
-    try {
-      error.value = '';
-      const amountNum = parseFloat(amount.value);
+const handleSubmit = async () => {
+  try {
+    error.value = ''
+    const amountNum = parseFloat(amount.value)
 
-      if (isNaN(amountNum) || amountNum <= 0) {
-        throw new Error(t('wallet.transfer.invalidAmount'));
-      }
-
-      if (isInsufficientBalance.value) {
-        throw new Error(t('wallet.transfer.insufficientBalance'));
-      }
-
-      if (!recipientAccount.value) {
-        throw new Error(t('wallet.transfer.recipientAccountRequired'));
-      }
-
-      if (!recipientAccount.value.startsWith('ACC-')) {
-        throw new Error(t('wallet.transfer.invalidAccountFormat'));
-      }
-
-      await walletStore.createTransaction(
-        amountNum,
-        currency.value,
-        'WITHDRAWAL',
-        recipientAccount.value,
-        undefined,
-        variableSymbol.value
-      );
-
-      notificationStore.addNotification(t('notifications.success.transferCreated'));
-
-      // Reset form
-      amount.value = '';
-      recipientAccount.value = '';
-      variableSymbol.value = '';
-    } catch (err: unknown) {
-      error.value = err?.toString()!;
+    if (Number.isNaN(amountNum) || amountNum <= 0) {
+      throw new Error(t('wallet.transfer.invalidAmount'))
     }
-  };
+
+    if (isInsufficientBalance.value) {
+      throw new Error(t('wallet.transfer.insufficientBalance'))
+    }
+
+    if (!recipientAccount.value) {
+      throw new Error(t('wallet.transfer.recipientAccountRequired'))
+    }
+
+    if (!recipientAccount.value.startsWith('ACC-')) {
+      throw new Error(t('wallet.transfer.invalidAccountFormat'))
+    }
+
+    await walletStore.createTransaction(
+      amountNum,
+      currency.value,
+      'WITHDRAWAL',
+      recipientAccount.value,
+      undefined,
+      variableSymbol.value
+    )
+
+    notificationStore.addNotification(t('notifications.success.transferCreated'))
+
+    amount.value = ''
+    recipientAccount.value = ''
+    variableSymbol.value = ''
+  } catch (err: unknown) {
+    error.value = String(err)
+  }
+}
 </script>
 
 <template>

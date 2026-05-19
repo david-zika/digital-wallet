@@ -1,5 +1,10 @@
-package com.example.wallet.exception;
+package com.example.exception;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum WalletErrorCode {
     // Obecné chyby (1xxx)
     INVALID_REQUEST("1001"),
@@ -25,12 +30,5 @@ public enum WalletErrorCode {
     INVALID_FIELD_VALUE("4003");
 
     private final String code;
-
-    WalletErrorCode(String code) {
-        this.code = code;
-    }
-
-    public String getCode() {
-        return code;
-    }
 }
+

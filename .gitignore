@@ -1,27 +1,45 @@
-# Logs
-logs
-*.log
+# ── Node ──────────────────────────────────────────────────────────────────────
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.log
 
-node_modules
-dist
-dist-ssr
-*.local
+# ── Frontend build output ──────────────────────────────────────────────────────
+packages/frontend/dist/
+packages/frontend/dist-ssr/
+packages/frontend/*.tsbuildinfo
 
-# Editor directories and files
+# ── Backend build output ───────────────────────────────────────────────────────
+packages/backend/target/
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IntelliJ IDEA ─────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# ── VS Code ───────────────────────────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json
-.idea
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
 .DS_Store
+
+# ── Windows ───────────────────────────────────────────────────────────────────
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-/packages/backend/target/classes/com/
-/packages/backend/target/generated-sources/
-/packages/backend/target/maven-status/
+
+# ── Docker volumes / local overrides ──────────────────────────────────────────
+docker-compose.override.yml

@@ -1,39 +1,36 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
-  import { useWalletStore } from '@/stores/wallet';
-  import { useI18n } from 'vue-i18n';
-  import { format } from 'date-fns';
-  import { Transaction } from '@/types/wallet';
+import { format } from 'date-fns'
+import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useWalletStore } from '@/stores/wallet'
+import type { Transaction } from '@/types/wallet'
 
-  const walletStore = useWalletStore();
-  const { t } = useI18n();
+const walletStore = useWalletStore()
+const { t } = useI18n()
 
-  const pageSizeOptions = [10, 50, 100];
+const pageSizeOptions = [10, 50, 100]
 
-  // Handle filter changes
-  const handleFilterChange = () => {
-    walletStore.updateFilters({});
-  };
+const handleFilterChange = () => {
+  walletStore.updateFilters({})
+}
 
-  // Handle page size change
-  const handlePageSizeChange = (newSize: number) => {
-    walletStore.updateFilters({ pageSize: newSize });
-  };
+const handlePageSizeChange = (newSize: number) => {
+  walletStore.updateFilters({ pageSize: newSize })
+}
 
-  // Format transaction reference
-  const getTransactionReference = (transaction: Transaction) => {
-    if (transaction.paymentReference) {
-      return transaction.paymentReference;
-    }
-    if (transaction.recipientAccount) {
-      return `${t('wallet.transactions.transferTo')} ${transaction.recipientAccount}`;
-    }
-    return '-';
-  };
+const getTransactionReference = (transaction: Transaction) => {
+  if (transaction.paymentReference) {
+    return transaction.paymentReference
+  }
+  if (transaction.recipientAccount) {
+    return `${t('wallet.transactions.transferTo')} ${transaction.recipientAccount}`
+  }
+  return '-'
+}
 
-  onMounted(() => {
-    walletStore.fetchTransactions();
-  });
+onMounted(() => {
+  walletStore.fetchTransactions()
+})
 </script>
 
 <template>
