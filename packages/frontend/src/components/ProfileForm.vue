@@ -81,11 +81,10 @@ const handleSubmit = async () => {
         <div class="mb-3">
           <label class="form-label">{{ t('auth.email') }}</label>
           <input
-            v-model="userEmail"
+            :value="userEmail"
             type="text"
             class="form-control"
             :disabled="true"
-            :placeholder="t('settings.profile.bankAccountPlaceholder')"
           />
         </div>
 

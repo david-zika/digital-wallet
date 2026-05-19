@@ -44,26 +44,31 @@ onMounted(async () => {
 const handleSubmit = async () => {
   if (isLoading.value) return
 
+  const amountNum = parseFloat(amount.value)
+
+  if (Number.isNaN(amountNum) || amountNum <= 0) {
+    error.value = t('wallet.withdraw.invalidAmount')
+    return
+  }
+
+  if (isInsufficientBalance.value) {
+    error.value = t('wallet.withdraw.insufficientBalance')
+    return
+  }
+
+  if (!recipientAccount.value) {
+    error.value = t('wallet.withdraw.noBankAccount')
+    return
+  }
+
+  if (!recipientName.value) {
+    error.value = t('wallet.withdraw.recipientNameRequired')
+    return
+  }
+
   try {
     error.value = ''
     isLoading.value = true
-    const amountNum = parseFloat(amount.value)
-
-    if (Number.isNaN(amountNum) || amountNum <= 0) {
-      throw new Error(t('wallet.withdraw.invalidAmount'))
-    }
-
-    if (isInsufficientBalance.value) {
-      throw new Error(t('wallet.withdraw.insufficientBalance'))
-    }
-
-    if (!recipientAccount.value) {
-      throw new Error(t('wallet.withdraw.noBankAccount'))
-    }
-
-    if (!recipientName.value) {
-      throw new Error(t('wallet.withdraw.recipientNameRequired'))
-    }
 
     await walletStore.createTransaction(
       amountNum,
@@ -79,7 +84,7 @@ const handleSubmit = async () => {
     amount.value = ''
     paymentReference.value = ''
   } catch (err: unknown) {
-    error.value = String(err)
+    error.value = handleError(err)
   } finally {
     isLoading.value = false
   }

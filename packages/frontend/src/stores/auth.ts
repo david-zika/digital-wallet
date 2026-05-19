@@ -43,55 +43,68 @@ export const useAuthStore = defineStore('auth', () => {
 
   const register = async (email: string, password: string, fullName: string) => {
     try {
+      isLoading.value = true
       error.value = null
       const response = await auth.register({ email, password, fullName })
       const newToken = response.data.token
       if (typeof newToken !== 'string') {
-        throw new Error('Invalid token received')
+        error.value = 'Invalid token received'
+        return
       }
       token.value = newToken
       localStorage.setItem('token', newToken)
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Registration failed'
       throw err
+    } finally {
+      isLoading.value = false
     }
   }
 
   const login = async (email: string, password: string) => {
     try {
+      isLoading.value = true
       error.value = null
       const response = await auth.login({ email, password })
       const newToken = response.data.token
       if (typeof newToken !== 'string') {
-        throw new Error('Invalid token received')
+        error.value = 'Invalid token received'
+        return
       }
       token.value = newToken
       localStorage.setItem('token', newToken)
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Login failed'
       throw err
+    } finally {
+      isLoading.value = false
     }
   }
 
   const updateProfile = async (data: Partial<Profile>) => {
     try {
+      isLoading.value = true
       const response = await auth.updateProfile(data)
       profile.value = response.data
-
       return response.data
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update profile'
       throw err
+    } finally {
+      isLoading.value = false
     }
   }
 
   const changePassword = async (currentPassword: string, newPassword: string) => {
     try {
+      isLoading.value = true
       error.value = null
       await auth.changePassword({ currentPassword, newPassword })
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Password change failed'
       throw err
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -121,6 +134,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token,
     isAuthenticated,
+    isLoading,
     error,
     profile,
     userEmail,

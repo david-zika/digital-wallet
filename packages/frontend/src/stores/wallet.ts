@@ -1,6 +1,6 @@
 import { Decimal } from 'decimal.js'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { wallet } from '@/services/api'
 import type { Transaction, WalletBalance } from '@/types/wallet'
 
@@ -16,8 +16,8 @@ interface TransactionFilters {
 }
 
 export const useWalletStore = defineStore('wallet', () => {
-  const balances = ref<WalletBalance[]>([])
-  const transactions = ref<Transaction[]>([])
+  const balances = shallowRef<WalletBalance[]>([])
+  const transactions = shallowRef<Transaction[]>([])
   const totalTransactions = ref(0)
   const totalPages = ref(0)
   const isLoading = ref(false)
@@ -119,20 +119,22 @@ export const useWalletStore = defineStore('wallet', () => {
     recipientName?: string,
     paymentReference?: string
   ) => {
+    if (amount <= 0) {
+      error.value = 'Amount must be greater than 0'
+      throw new Error('Amount must be greater than 0')
+    }
+
+    if (type === 'WITHDRAWAL') {
+      const currentBalance = getBalance(currency)
+      if (new Decimal(currentBalance).lessThan(amount)) {
+        error.value = 'Insufficient balance'
+        throw new Error('Insufficient balance')
+      }
+    }
+
     try {
       isLoading.value = true
       error.value = null
-
-      if (amount <= 0) {
-        throw new Error('Amount must be greater than 0')
-      }
-
-      if (type === 'WITHDRAWAL') {
-        const currentBalance = getBalance(currency)
-        if (new Decimal(currentBalance).lessThan(amount)) {
-          throw new Error('Insufficient balance')
-        }
-      }
 
       await wallet.createTransaction(
         amount,

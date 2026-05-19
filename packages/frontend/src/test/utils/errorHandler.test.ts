@@ -1,0 +1,125 @@
+import { describe, expect, it, vi } from 'vitest'
+import { useErrorHandler } from '@/utils/errorHandler'
+
+// Mock i18n
+vi.mock('@/i18n', () => ({
+  i18n: {
+    global: {
+      t: (key: string) => key,
+    },
+  },
+}))
+
+describe('useErrorHandler', () => {
+  const { handleError } = useErrorHandler()
+
+  describe('handleError – Axios chyby', () => {
+    it('přeloží RECIPIENT_NOT_FOUND přes error code', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: {
+          data: { code: 'RECIPIENT_NOT_FOUND', message: 'Recipient not found' },
+        },
+        message: 'Request failed',
+      }
+      const result = handleError(axiosError)
+      expect(result).toBe('errors.recipientNotFound')
+    })
+
+    it('přeloží INSUFFICIENT_FUNDS přes error code', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: {
+          data: { code: 'INSUFFICIENT_FUNDS', message: 'Not enough money' },
+        },
+        message: 'Request failed',
+      }
+      const result = handleError(axiosError)
+      expect(result).toBe('errors.insufficientFunds')
+    })
+
+    it('přeloží INVALID_AMOUNT přes error code', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: { data: { code: 'INVALID_AMOUNT', message: 'Bad amount' } },
+        message: 'Request failed',
+      }
+      expect(handleError(axiosError)).toBe('errors.invalidAmount')
+    })
+
+    it('přeloží INVALID_CURRENCY přes error code', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: { data: { code: 'INVALID_CURRENCY', message: 'Bad currency' } },
+        message: 'Request failed',
+      }
+      expect(handleError(axiosError)).toBe('errors.invalidCurrency')
+    })
+
+    it('přeloží TRANSACTION_FAILED přes error code', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: { data: { code: 'TRANSACTION_FAILED', message: 'Failed' } },
+        message: 'Request failed',
+      }
+      expect(handleError(axiosError)).toBe('errors.transactionFailed')
+    })
+
+    it('vrátí message ze serveru, pokud code není v mapě', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: { data: { code: 'UNKNOWN_CODE', message: 'Server message' } },
+        message: 'Request failed',
+      }
+      expect(handleError(axiosError)).toBe('Server message')
+    })
+
+    it('vrátí errors.networkError při síťové chybě', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: undefined,
+        message: 'Network Error',
+      }
+      expect(handleError(axiosError)).toBe('errors.networkError')
+    })
+
+    it('vrátí axiosError.message při neznámé Axios chybě', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: undefined,
+        message: 'timeout of 5000ms exceeded',
+      }
+      expect(handleError(axiosError)).toBe('timeout of 5000ms exceeded')
+    })
+
+    it('vrátí errors.default pro Axios chybu bez message', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: { data: {} },
+        message: '',
+      }
+      expect(handleError(axiosError)).toBe('errors.default')
+    })
+  })
+
+  describe('handleError – standardní Error', () => {
+    it('vrátí message z Error instance', () => {
+      expect(handleError(new Error('Something went wrong'))).toBe('Something went wrong')
+    })
+  })
+
+  describe('handleError – neznámé chyby', () => {
+    it('vrátí errors.default pro null', () => {
+      expect(handleError(null)).toBe('errors.default')
+    })
+
+    it('vrátí errors.default pro undefined', () => {
+      expect(handleError(undefined)).toBe('errors.default')
+    })
+
+    it('vrátí errors.default pro string', () => {
+      expect(handleError('something')).toBe('errors.default')
+    })
+  })
+})
+

@@ -25,8 +25,8 @@ export const useErrorHandler = () => {
           TRANSACTION_FAILED: 'errors.transactionFailed',
         }
 
-        if (code && message in errorMap) {
-          return t(errorMap[message])
+        if (code && code in errorMap) {
+          return t(errorMap[code])
         }
 
         if (message) {
@@ -38,7 +38,7 @@ export const useErrorHandler = () => {
         return t('errors.networkError')
       }
 
-      return axiosError.message
+      return axiosError.message || t('errors.default')
     }
 
     if (error instanceof Error) {

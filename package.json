@@ -11,6 +11,8 @@
     "format": "npm run format -w @digital-wallet/frontend",
     "lint": "npm run lint -w @digital-wallet/frontend",
     "typecheck": "npm run typecheck -w @digital-wallet/frontend",
-    "check-all": "npm run format && npm run lint && npm run typecheck"
+    "test": "npm run test:run -w @digital-wallet/frontend",
+    "test:coverage": "npm run test:coverage -w @digital-wallet/frontend",
+    "check-all": "npm run format && npm run lint && npm run typecheck && npm run test"
   }
 }

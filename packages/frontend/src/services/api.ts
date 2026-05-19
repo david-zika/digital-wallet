@@ -24,14 +24,6 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
-    if (response.status >= 400) {
-      if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('token')
-        window.location.href = '/'
-      }
-
-      return Promise.reject(response)
-    }
     return response
   },
   (error) => {
@@ -108,4 +100,4 @@ export const wallet = {
     }),
 }
 
-export default api
+

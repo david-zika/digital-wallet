@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useNotificationStore } from '@/stores/notification.ts'
+import { useNotificationStore } from '@/stores/notification'
 import { useWalletStore } from '@/stores/wallet'
 
 const notificationStore = useNotificationStore()
@@ -21,25 +21,30 @@ const isInsufficientBalance = computed(() => {
 })
 
 const handleSubmit = async () => {
+  const amountNum = parseFloat(amount.value)
+
+  if (Number.isNaN(amountNum) || amountNum <= 0) {
+    error.value = t('wallet.transfer.invalidAmount')
+    return
+  }
+
+  if (isInsufficientBalance.value) {
+    error.value = t('wallet.transfer.insufficientBalance')
+    return
+  }
+
+  if (!recipientAccount.value) {
+    error.value = t('wallet.transfer.recipientAccountRequired')
+    return
+  }
+
+  if (!recipientAccount.value.startsWith('ACC-')) {
+    error.value = t('wallet.transfer.invalidAccountFormat')
+    return
+  }
+
   try {
     error.value = ''
-    const amountNum = parseFloat(amount.value)
-
-    if (Number.isNaN(amountNum) || amountNum <= 0) {
-      throw new Error(t('wallet.transfer.invalidAmount'))
-    }
-
-    if (isInsufficientBalance.value) {
-      throw new Error(t('wallet.transfer.insufficientBalance'))
-    }
-
-    if (!recipientAccount.value) {
-      throw new Error(t('wallet.transfer.recipientAccountRequired'))
-    }
-
-    if (!recipientAccount.value.startsWith('ACC-')) {
-      throw new Error(t('wallet.transfer.invalidAccountFormat'))
-    }
 
     await walletStore.createTransaction(
       amountNum,
