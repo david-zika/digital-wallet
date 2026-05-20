@@ -1,9 +1,14 @@
 import type { AxiosError } from 'axios'
 import { i18n } from '@/core/i18n'
 
-interface ErrorResponse {
-  code: string
-  message: string
+/** RFC 9457 Problem Detail response (Spring ProblemDetail) */
+interface ProblemDetail {
+  status: number
+  title?: string
+  detail?: string
+  code?: string
+  // legacy fallback – kept for backwards compatibility
+  message?: string
 }
 
 export const useErrorHandler = () => {
@@ -11,12 +16,13 @@ export const useErrorHandler = () => {
 
   const handleError = (error: unknown): string => {
     if (error && typeof error === 'object' && 'isAxiosError' in error) {
-      const axiosError = error as AxiosError<ErrorResponse>
+      const axiosError = error as AxiosError<ProblemDetail>
 
       if (axiosError.response?.data) {
-        const { code, message } = axiosError.response.data
+        const { title, detail, message } = axiosError.response.data
+        const errorText = detail || message
 
-        // Maps backend error codes to i18n translation keys
+        // Map backend error-code names (ProblemDetail.title) to i18n keys
         const errorMap: Record<string, string> = {
           RECIPIENT_NOT_FOUND: 'errors.recipientNotFound',
           INSUFFICIENT_FUNDS: 'errors.insufficientFunds',
@@ -25,12 +31,12 @@ export const useErrorHandler = () => {
           TRANSACTION_FAILED: 'errors.transactionFailed',
         }
 
-        if (code && code in errorMap) {
-          return t(errorMap[code])
+        if (title && title in errorMap) {
+          return t(errorMap[title])
         }
 
-        if (message) {
-          return message
+        if (errorText) {
+          return errorText
         }
       }
 

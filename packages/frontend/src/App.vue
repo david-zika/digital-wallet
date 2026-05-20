@@ -4,11 +4,11 @@ import router from '@/core/router'
 import { useAuthStore } from '@/features/auth/stores/auth'
 import { useWalletStore } from '@/features/wallet/stores/wallet'
 import logo from './assets/logo.svg'
-import Footer from './components/Footer.vue'
-import LanguageSelector from './components/LanguageSelector.vue'
-import LoadingSpinner from './components/LoadingSpinner.vue'
-import NotificationList from './components/NotificationList.vue'
-import UserInfo from './components/UserInfo.vue'
+import Footer from '@/shared/components/Footer.vue'
+import LanguageSelector from '@/shared/components/LanguageSelector.vue'
+import LoadingSpinner from '@/shared/components/LoadingSpinner.vue'
+import NotificationList from '@/shared/components/NotificationList.vue'
+import UserInfo from '@/features/auth/components/UserInfo.vue'
 
 const authStore = useAuthStore()
 const walletStore = useWalletStore()

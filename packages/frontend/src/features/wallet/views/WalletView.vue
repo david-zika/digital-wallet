@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import DepositForm from '@/features/wallet/components/DepositForm.vue'
-import LoadingSpinner from '@/shared/components/LoadingSpinner.vue'
 import TransactionHistory from '@/features/wallet/components/TransactionHistory.vue'
 import TransferForm from '@/features/wallet/components/TransferForm.vue'
 import WalletBalance from '@/features/wallet/components/WalletBalance.vue'
 import WithdrawForm from '@/features/wallet/components/WithdrawForm.vue'
 import { useWalletStore } from '@/features/wallet/stores/wallet'
+import LoadingSpinner from '@/shared/components/LoadingSpinner.vue'
 
 const walletStore = useWalletStore()
 </script>

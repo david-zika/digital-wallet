@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB:
       POSTGRES_USER:
@@ -12,6 +12,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: always
+    command: redis-server --save "" --appendonly no
 
   backend:
     build:
@@ -23,8 +30,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/
       SPRING_DATASOURCE_USERNAME:
       SPRING_DATASOURCE_PASSWORD:
+      SPRING_DATA_REDIS_HOST: redis
     depends_on:
       - postgres
+      - redis
 
   frontend:
     build:

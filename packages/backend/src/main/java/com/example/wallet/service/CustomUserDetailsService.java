@@ -1,6 +1,7 @@
 package com.example.wallet.service;
 
 import com.example.wallet.repository.UserRepository;
+import com.example.wallet.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
+                .map(UserPrincipal::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 }

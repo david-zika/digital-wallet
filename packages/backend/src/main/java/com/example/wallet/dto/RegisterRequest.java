@@ -3,25 +3,19 @@ package com.example.wallet.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class RegisterRequest {
+public record RegisterRequest(
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        String email,
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    private String email;
+        @NotBlank(message = "Password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters")
+        String password,
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    private String password;
+        @NotBlank(message = "Full name is required")
+        String fullName,
 
-    @NotBlank(message = "Full name is required")
-    private String fullName;
-
-    private String bankAccount;
+        String bankAccount
+) {
 }

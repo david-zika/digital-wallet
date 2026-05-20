@@ -2,8 +2,8 @@ package com.example.wallet.controller;
 
 import com.example.wallet.dto.ProfileResponse;
 import com.example.wallet.dto.UpdateProfileRequest;
-import com.example.wallet.model.User;
-import com.example.wallet.service.ProfileService;
+import com.example.wallet.security.UserPrincipal;
+import com.example.wallet.service.port.ProfileServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,12 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Profile", description = "User profile management API")
 public class ProfileController {
-    private final ProfileService profileService;
+    private final ProfileServicePort profileService;
 
-    @Operation(
-        summary = "Get user profile",
-        description = "Retrieves the current user's profile information"
-    )
+    @Operation(summary = "Get user profile", description = "Retrieves the current user's profile information")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Profile retrieved successfully",
             content = @Content(schema = @Schema(implementation = ProfileResponse.class))),
@@ -34,14 +31,11 @@ public class ProfileController {
     })
     @GetMapping
     public ResponseEntity<ProfileResponse> getProfile(
-            @AuthenticationPrincipal User userDetails) {
-        return ResponseEntity.ok(profileService.getProfile(userDetails.getId()));
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(profileService.getProfile(principal.getId()));
     }
 
-    @Operation(
-        summary = "Update user profile",
-        description = "Updates the current user's profile information"
-    )
+    @Operation(summary = "Update user profile", description = "Updates the current user's profile information")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Profile updated successfully",
             content = @Content(schema = @Schema(implementation = ProfileResponse.class))),
@@ -50,8 +44,8 @@ public class ProfileController {
     })
     @PutMapping
     public ResponseEntity<ProfileResponse> updateProfile(
-            @AuthenticationPrincipal User userDetails,
+            @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody UpdateProfileRequest request) {
-        return ResponseEntity.ok(profileService.updateProfile(userDetails.getId(), request));
+        return ResponseEntity.ok(profileService.updateProfile(principal.getId(), request));
     }
 }

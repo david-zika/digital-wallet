@@ -1,9 +1,14 @@
 package com.example.wallet;
 
+import com.example.wallet.config.AppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication(scanBasePackages = {"com.example.wallet", "com.example.exception"})
+@SpringBootApplication
+@EnableConfigurationProperties(AppProperties.class)
+@EnableScheduling
 public class WalletApplication {
     public static void main(String[] args) {
         SpringApplication.run(WalletApplication.class, args);

@@ -1,10 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/features/auth/stores/auth'
 
-// Lazy-loaded components to prevent circular dependencies
-const LoginView = () => import('@/views/LoginView.vue')
-const WalletView = () => import('@/views/WalletView.vue')
-const SettingsView = () => import('@/views/SettingsView.vue')
+const LoginView = () => import('@/features/auth/views/LoginView.vue')
+const WalletView = () => import('@/features/wallet/views/WalletView.vue')
+const SettingsView = () => import('@/features/auth/views/SettingsView.vue')
 
 const router = createRouter({
   history: createWebHistory(),

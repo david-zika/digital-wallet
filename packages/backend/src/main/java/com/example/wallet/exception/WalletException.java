@@ -1,4 +1,4 @@
-package com.example.exception;
+package com.example.wallet.exception;
 
 import lombok.Getter;
 
@@ -7,7 +7,7 @@ public class WalletException extends RuntimeException {
     private final WalletErrorCode errorCode;
 
     public WalletException(WalletErrorCode errorCode) {
-        super(errorCode.name());
+        super(errorCode.getDefaultMessage());
         this.errorCode = errorCode;
     }
 
@@ -16,3 +16,4 @@ public class WalletException extends RuntimeException {
         this.errorCode = errorCode;
     }
 }
+

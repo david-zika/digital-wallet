@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import io.jsonwebtoken.security.Keys;
@@ -24,10 +25,15 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
+    @Value("${jwt.issuer}")
+    private String jwtIssuer;
+
+    @Value("${jwt.audience}")
+    private String jwtAudience;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -39,11 +45,16 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        Date now = new Date();
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .issuer(jwtIssuer)
+                .audience().add(jwtAudience).and()
+                .id(UUID.randomUUID().toString())
+                .issuedAt(now)
+                .notBefore(now)
+                .expiration(new Date(now.getTime() + jwtExpiration))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -64,6 +75,8 @@ public class JwtService {
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
+                .requireIssuer(jwtIssuer)
+                .requireAudience(jwtAudience)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

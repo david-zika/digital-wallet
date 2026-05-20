@@ -22,6 +22,7 @@ const notificationStore = useNotificationStore()
 </template>
 
 <style scoped lang="scss">
+
   .notification-container {
     position: fixed;
     top: 20px;
@@ -44,13 +45,13 @@ const notificationStore = useNotificationStore()
     &-success {
       background-color: $success-bg;
       color: $success-text;
-      border: 1px solid darken($success-bg, 10%);
+      border: 1px solid color.adjust($success-bg, $lightness: -10%);
     }
 
     &-error {
       background-color: $danger-bg;
       color: $danger-text;
-      border: 1px solid darken($danger-bg, 10%);
+      border: 1px solid color.adjust($danger-bg, $lightness: -10%);
     }
   }
 

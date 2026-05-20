@@ -126,7 +126,12 @@ describe('useAuthStore', () => {
     it('odstraní profil při odhlášení', async () => {
       vi.mocked(authApi.login).mockResolvedValue({ data: { token: mockToken } } as never)
       vi.mocked(authApi.getProfile).mockResolvedValue({
-        data: { fullName: 'Jan Novák', bankAccount: '123456/0100', email: 'test@example.com', accountReference: 'ACC-123' },
+        data: {
+          fullName: 'Jan Novák',
+          bankAccount: '123456/0100',
+          email: 'test@example.com',
+          accountReference: 'ACC-123',
+        },
       } as never)
       const store = useAuthStore()
       await store.login('test@example.com', 'password')
@@ -161,7 +166,12 @@ describe('useAuthStore', () => {
     it('načte a uloží profil', async () => {
       vi.mocked(authApi.login).mockResolvedValue({ data: { token: mockToken } } as never)
       vi.mocked(authApi.getProfile).mockResolvedValue({
-        data: { fullName: 'Jan Novák', bankAccount: 'CZ1234567890', email: 'test@example.com', accountReference: 'ACC-123' },
+        data: {
+          fullName: 'Jan Novák',
+          bankAccount: 'CZ1234567890',
+          email: 'test@example.com',
+          accountReference: 'ACC-123',
+        },
       } as never)
       const store = useAuthStore()
       await store.login('test@example.com', 'password')
@@ -200,4 +210,3 @@ describe('useAuthStore', () => {
     })
   })
 })
-

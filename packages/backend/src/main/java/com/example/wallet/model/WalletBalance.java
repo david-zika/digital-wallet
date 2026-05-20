@@ -3,20 +3,24 @@ package com.example.wallet.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "wallet_balances")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 public class WalletBalance {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -29,8 +33,10 @@ public class WalletBalance {
     @Column(nullable = false, precision = 20, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
+    @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime lastUpdated = LocalDateTime.now();
+    private Instant lastUpdated;
+
 
     public enum Currency {
         EUR, CZK

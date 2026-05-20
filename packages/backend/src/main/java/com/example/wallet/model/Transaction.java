@@ -3,14 +3,17 @@ package com.example.wallet.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 
 @Entity
 @Table(name = "transactions")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 public class Transaction {
@@ -42,8 +45,10 @@ public class Transaction {
     private String recipientName;
     private String paymentReference;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
 
     public enum Type {
         DEPOSIT, WITHDRAWAL

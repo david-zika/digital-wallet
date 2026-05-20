@@ -39,4 +39,3 @@ config.global.stubs = {
 
 // Potlačit console.error ve výpisech testů pro Vue warnings
 vi.spyOn(console, 'warn').mockImplementation(() => {})
-

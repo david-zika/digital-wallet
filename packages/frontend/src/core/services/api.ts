@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { useErrorHandler } from '@/shared/utils/errorHandler'
 
@@ -22,17 +23,82 @@ api.interceptors.request.use(
   }
 )
 
-api.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  (error) => {
-    const { handleError } = useErrorHandler()
+let isRefreshing = false
+let refreshSubscribers: ((token: string) => void)[] = []
 
-    if (error.response?.status === 401 || error.response?.status === 403) {
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb)
+}
+
+function onRefreshSuccess(newToken: string) {
+  for (const cb of refreshSubscribers) {
+    cb(newToken)
+  }
+  refreshSubscribers = []
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const { handleError } = useErrorHandler()
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
+
+    const isAuthEndpoint =
+      originalRequest.url?.includes('/auth/login') ||
+      originalRequest.url?.includes('/auth/register') ||
+      originalRequest.url?.includes('/auth/refresh')
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+      const refreshToken = localStorage.getItem('refreshToken')
+
+      if (refreshToken) {
+        if (isRefreshing) {
+          return new Promise((resolve) => {
+            subscribeTokenRefresh((newToken) => {
+              originalRequest.headers = {
+                ...originalRequest.headers,
+                Authorization: `Bearer ${newToken}`,
+              }
+              resolve(api(originalRequest))
+            })
+          })
+        }
+
+        originalRequest._retry = true
+        isRefreshing = true
+
+        try {
+          const response = await api.post('/auth/refresh', { refreshToken })
+          const { token: newToken, refreshToken: newRefreshToken } = response.data
+          localStorage.setItem('token', newToken)
+          localStorage.setItem('refreshToken', newRefreshToken)
+          api.defaults.headers.common.Authorization = `Bearer ${newToken}`
+          onRefreshSuccess(newToken)
+          isRefreshing = false
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${newToken}`,
+          }
+          return api(originalRequest)
+        } catch {
+          isRefreshing = false
+          refreshSubscribers = []
+          localStorage.removeItem('token')
+          localStorage.removeItem('refreshToken')
+          window.location.href = '/'
+        }
+      } else {
+        localStorage.removeItem('token')
+        window.location.href = '/'
+      }
+    }
+
+    if (error.response?.status === 403) {
       localStorage.removeItem('token')
+      localStorage.removeItem('refreshToken')
       window.location.href = '/'
     }
+
     return Promise.reject(handleError(error))
   }
 )
@@ -58,6 +124,10 @@ export const auth = {
     api.post('/auth/register', data),
 
   login: (data: { email: string; password: string }) => api.post('/auth/login', data),
+
+  refresh: (refreshToken: string) => api.post('/auth/refresh', { refreshToken }),
+
+  logout: (refreshToken: string) => api.post('/auth/logout', { refreshToken }),
 
   getProfile: () => api.get<Profile>('/auth/profile'),
 
@@ -99,5 +169,3 @@ export const wallet = {
       paymentReference,
     }),
 }
-
-

@@ -1,0 +1,21 @@
+
+$primary-color: #0d6efd;
+$secondary-color: #6c757d;
+$success-color: #198754;
+$danger-color: #dc3545;
+$warning-bg: #fff3cd;
+$warning-text: #856404;
+$success-bg: #d4edda;
+$success-text: #155724;
+$danger-bg: #f8d7da;
+$danger-text: #721c24;
+
+@mixin transaction-status($bg-color, $text-color) {
+  background-color: $bg-color !important;
+  color: $text-color !important;
+}
+
+@mixin amount-color($color) {
+  color: $color;
+}
+

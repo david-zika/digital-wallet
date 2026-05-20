@@ -4,8 +4,8 @@ import com.example.wallet.dto.TransactionDTO;
 import com.example.wallet.dto.TransactionRequest;
 import com.example.wallet.dto.TransactionResponse;
 import com.example.wallet.dto.WalletBalanceDTO;
-import com.example.wallet.model.User;
-import com.example.wallet.service.WalletService;
+import com.example.wallet.security.UserPrincipal;
+import com.example.wallet.service.port.WalletServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +33,7 @@ import java.util.List;
 @Tag(name = "Wallet", description = "Wallet management API")
 public class WalletController {
 
-    private final WalletService walletService;
+    private final WalletServicePort walletService;
 
     @Operation(summary = "Get wallet balances",
                description = "Retrieves current balances for all currencies in the user's wallet")
@@ -43,8 +44,8 @@ public class WalletController {
     })
     @GetMapping("/balances")
     public ResponseEntity<List<WalletBalanceDTO>> getBalances(
-            @AuthenticationPrincipal User userDetails) {
-        return ResponseEntity.ok(walletService.getBalances(userDetails.getId()));
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(walletService.getBalances(principal.getId()));
     }
 
     @Operation(summary = "Get transactions",
@@ -56,7 +57,7 @@ public class WalletController {
     })
     @GetMapping("/transactions")
     public ResponseEntity<TransactionResponse> getTransactions(
-            @AuthenticationPrincipal User userDetails,
+            @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Page number (1-based, min 1)")
                 @RequestParam(defaultValue = "1") @Min(1) int page,
             @Parameter(description = "Page size (max 100)")
@@ -71,13 +72,13 @@ public class WalletController {
                 @RequestParam(required = false) String type) {
 
         return ResponseEntity.ok(walletService.getTransactions(
-                userDetails.getId(), page, size, amountFrom, amountTo, reference, type));
+                principal.getId(), page, size, amountFrom, amountTo, reference, type));
     }
 
     @Operation(summary = "Create transaction",
                description = "Creates a new transaction (deposit, withdrawal, or transfer)")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Transaction created successfully",
+        @ApiResponse(responseCode = "201", description = "Transaction created successfully",
             content = @Content(schema = @Schema(implementation = TransactionDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input data"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -86,19 +87,19 @@ public class WalletController {
     })
     @PostMapping("/transactions")
     public ResponseEntity<TransactionDTO> createTransaction(
-            @AuthenticationPrincipal User userDetails,
+            @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody TransactionRequest request) {
 
         TransactionDTO transaction = walletService.createTransaction(
-                userDetails.getId(),
-                request.getAmount(),
-                request.getCurrency(),
-                request.getType(),
-                request.getRecipientAccount(),
-                request.getRecipientName(),
-                request.getPaymentReference()
+                principal.getId(),
+                request.amount(),
+                request.currency(),
+                request.type(),
+                request.recipientAccount(),
+                request.recipientName(),
+                request.paymentReference()
         );
 
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
     }
 }

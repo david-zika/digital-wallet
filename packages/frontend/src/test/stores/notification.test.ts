@@ -77,4 +77,3 @@ describe('useNotificationStore', () => {
     expect(store.notifications).toHaveLength(1)
   })
 })
-

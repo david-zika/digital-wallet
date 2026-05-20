@@ -2,9 +2,13 @@
 import QRCode from 'qrcode.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useNotificationStore } from '@/shared/stores/notification'
 import { useWalletStore } from '@/features/wallet/stores/wallet'
-import type { CZKInstructions, EURInstructions, PaymentInstructions } from '@/features/wallet/types/wallet'
+import type {
+  CZKInstructions,
+  EURInstructions,
+  PaymentInstructions,
+} from '@/features/wallet/types/wallet'
+import { useNotificationStore } from '@/shared/stores/notification'
 
 const walletStore = useWalletStore()
 const notificationStore = useNotificationStore()

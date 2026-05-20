@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useNotificationStore } from '@/shared/stores/notification'
 import { useWalletStore } from '@/features/wallet/stores/wallet'
+import { useNotificationStore } from '@/shared/stores/notification'
 
 const notificationStore = useNotificationStore()
 const walletStore = useWalletStore()

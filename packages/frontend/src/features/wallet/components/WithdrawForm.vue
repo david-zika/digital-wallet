@@ -2,8 +2,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/features/auth/stores/auth'
-import { useNotificationStore } from '@/shared/stores/notification'
 import { useWalletStore } from '@/features/wallet/stores/wallet'
+import { useNotificationStore } from '@/shared/stores/notification'
 import { useErrorHandler } from '@/shared/utils/errorHandler'
 
 const walletStore = useWalletStore()
