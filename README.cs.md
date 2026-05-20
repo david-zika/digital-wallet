@@ -84,11 +84,11 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 3. Změna hesla:
     - Zadání současného hesla
     - Zadání a potvrzení nového hesla
-    - Heslo musí mít alespoň 6 znaků
+    - Heslo musí mít alespoň 8 znaků
 
 #### Bezpečnostní pokyny
 1. Požadavky na heslo:
-    - Minimálně 6 znaků
+    - Minimálně 8 znaků
     - Doporučena kombinace písmen a čísel
     - Doporučena pravidelná změna hesla
 2. Ochrana účtu:
@@ -109,7 +109,7 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 
 2. Pravidla pro zůstatek
    - Nelze vybrat více než dostupný zůstatek
-   - Minimální částka transakce: 0,01
+   - Minimální částka transakce: 5,00
    - Zůstatek nemůže být záporný
 
 3. Zpracování transakcí
@@ -137,11 +137,15 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 - Bootstrap 5 pro UI komponenty
 - Axios pro komunikaci s API
 - TypeScript pro typovou bezpečnost
+- Generování QR kódů pro platby
+- Notifikace v reálném čase
+- Biome pro linting a formátování
 
 #### Backend (Spring Boot)
-- Spring Security s JWT
+- Spring Security s JWT (přístupový + refresh token)
 - Spring Data JPA
 - PostgreSQL databáze
+- Redis pro ukládání refresh tokenů
 - Flyway pro databázové migrace
 - OpenAPI/Swagger pro dokumentaci API
 
@@ -156,14 +160,30 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
   ```json
   {
     "email": "user@example.com",
-    "password": "password123"
+    "password": "password123",
+    "fullName": "Jan Novák",
+    "bankAccount": "1234567890/0100"
   }
   ```
+  Odpověď: `{ "token": "...", "refreshToken": "..." }`
 - POST `/api/auth/login`: Přihlášení uživatele
   ```json
   {
     "email": "user@example.com",
     "password": "password123"
+  }
+  ```
+  Odpověď: `{ "token": "...", "refreshToken": "..." }`
+- POST `/api/auth/refresh`: Obnova přístupového tokenu
+  ```json
+  {
+    "refreshToken": "<refresh-token>"
+  }
+  ```
+- POST `/api/auth/logout`: Odhlášení (zneplatnění refresh tokenu)
+  ```json
+  {
+    "refreshToken": "<refresh-token>"
   }
   ```
 - POST `/api/auth/change-password`: Změna hesla
@@ -183,13 +203,12 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
     "amount": 100.00,
     "currency": "EUR",
     "type": "DEPOSIT",
-    "isDemoMode": false,
     "recipientAccount": "ACC-12345678",  // Volitelné, pro převody
     "recipientName": "Jan Novák",        // Volitelné
-    "paymentReference": "Faktura 123"     // Volitelné
+    "paymentReference": "Faktura 123"    // Volitelné
   }
   ```
-- POST `/api/wallet/transactions/{id}/process`: Zpracování čekající transakce
+  > **Poznámka:** Demo režim (okamžité zpracování transakcí) je řízen serverovou konfigurací `app.demo-mode`, nikoli polem v požadavku.
 
 ### Databázové schéma
 
@@ -198,10 +217,12 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 - `email` (VARCHAR): Unikátní email uživatele
 - `password` (VARCHAR): Hashované heslo
 - `account_reference` (VARCHAR): Unikátní referenční číslo účtu
+- `full_name` (VARCHAR): Celé jméno
+- `bank_account` (VARCHAR): Číslo bankovního účtu
 - `created_at` (TIMESTAMP): Datum vytvoření účtu
 
 #### Tabulka Wallet Balances
-- `id` (BIGSERIAL): Primární klíč
+- `id` (UUID): Primární klíč
 - `user_id` (UUID): Cizí klíč na users
 - `currency` (VARCHAR): EUR nebo CZK
 - `balance` (DECIMAL): Aktuální zůstatek
@@ -218,6 +239,13 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 - `recipient_name` (VARCHAR): Pro výběry
 - `payment_reference` (VARCHAR): Volitelná reference
 - `created_at` (TIMESTAMP): Časové razítko transakce
+
+#### Tabulka Refresh Tokens
+- `id` (UUID): Primární klíč
+- `user_id` (UUID): Cizí klíč na users
+- `token` (VARCHAR): Unikátní refresh token
+- `expires_at` (TIMESTAMP): Platnost tokenu
+- `created_at` (TIMESTAMP): Datum vytvoření
 
 ### Implementace zabezpečení
 
@@ -237,8 +265,9 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 
 1. Předpoklady
     - Node.js 20+
-    - Java 17+
+    - Java 21+
     - PostgreSQL 15+
+    - Redis 7+
     - Docker a Docker Compose
 
 2. Instalace
@@ -268,13 +297,14 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 4. Kontrola kódu
    ```bash
    # Frontend
-   npm run format      # Spustí Prettier
-   npm run lint       # Spustí ESLint
+   npm run format      # Spustí Biome formátování
+   npm run lint       # Spustí Biome lint
    npm run typecheck  # Spustí TypeScript kontrolu
-   npm run check-all  # Spustí vše v pořadí format -> lint -> typecheck
+   npm run test       # Spustí testy
+   npm run check-all  # Spustí vše v pořadí format -> lint -> typecheck -> test
 
    # Backend
-   npm run format:backend  # Formátuje Java kód
+   ./mvnw verify      # Spustí všechny kontroly a testy
    ```
 
 ### Proměnné prostředí
@@ -287,11 +317,22 @@ spring.datasource.username=your-username-here
 spring.datasource.password=your-password-here
 
 # JWT Konfigurace
-jwt.secret=your-secret-key-here
-jwt.expiration=86400000
+jwt.secret=your-secret-key-min-64-chars-here
+jwt.expiration=900000
+jwt.refresh-expiration=604800000
+jwt.issuer=digital-wallet-api
+jwt.audience=digital-wallet-client
+
+# Konfigurace aplikace
+app.demo-mode=false
+app.cors-allowed-origins=http://localhost:5173
 
 # Konfigurace serveru
 server.port=8080
+
+# Redis
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
 ```
 
 #### Frontend (`.env`)
@@ -310,6 +351,7 @@ VITE_API_URL=http://localhost:8080/api
 *  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_NAME
 *  SPRING_DATASOURCE_USERNAME
 *  SPRING_DATASOURCE_PASSWORD
+*  SPRING_DATA_REDIS_HOST: redis
 
 1. Sestavení obrazů:
    ```bash

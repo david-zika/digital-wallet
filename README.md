@@ -84,11 +84,11 @@ A modern digital wallet application built with Vue.js and Spring Boot.
 3. Change your password:
     - Enter current password
     - Enter and confirm new password
-    - Password must be at least 6 characters
+    - Password must be at least 8 characters
 
 #### Security Guidelines
 1. Password Requirements:
-    - Minimum 6 characters
+    - Minimum 8 characters
     - Mix of letters and numbers recommended
     - Regular password changes recommended
 2. Account Protection:
@@ -109,7 +109,7 @@ A modern digital wallet application built with Vue.js and Spring Boot.
 
 2. Balance Rules
    - Cannot withdraw more than available balance
-   - Minimum transaction amount: 0.01
+   - Minimum transaction amount: 5.00
    - Balance cannot go negative
 
 3. Transaction Processing
@@ -127,23 +127,6 @@ A modern digital wallet application built with Vue.js and Spring Boot.
 
 # Technical Documentation
 
-## Features
-
-- Multi-currency support (EUR and CZK)
-- Secure user authentication with JWT
-- Real-time balance tracking
-- Multiple transaction types:
-    - Instant deposits with demo mode
-    - Bank withdrawals
-    - Wallet-to-wallet transfers
-- QR code generation for deposits
-- Transaction history with filtering and pagination
-- Profile management
-- Multi-language support (EN, CS, SK, ES, DE)
-- Responsive design with Bootstrap 5
-- Comprehensive error handling
-- Real-time notifications
-
 ## Architecture
 
 ### Frontend (Vue.js)
@@ -155,11 +138,14 @@ A modern digital wallet application built with Vue.js and Spring Boot.
 - Axios for API communication
 - QR code generation for payments
 - Real-time notifications system
+- Biome for linting and formatting
 
 ### Backend (Spring Boot)
-- Spring Security with JWT authentication
+- Spring Security with JWT authentication (access + refresh tokens)
 - Spring Data JPA for database access
 - PostgreSQL database
+- Redis for refresh token storage
+- Flyway for database migrations
 - Swagger/OpenAPI documentation
 - Comprehensive error handling
 - Transaction management
@@ -182,6 +168,14 @@ Content-Type: application/json
 }
 ```
 
+Response:
+```json
+{
+  "token": "<access-token>",
+  "refreshToken": "<refresh-token>"
+}
+```
+
 #### Login
 ```http
 POST /api/auth/login
@@ -190,6 +184,34 @@ Content-Type: application/json
 {
   "email": "user@example.com",
   "password": "password123"
+}
+```
+
+Response:
+```json
+{
+  "token": "<access-token>",
+  "refreshToken": "<refresh-token>"
+}
+```
+
+#### Refresh Access Token
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "<refresh-token>"
+}
+```
+
+#### Logout
+```http
+POST /api/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "<refresh-token>"
 }
 ```
 
@@ -259,10 +281,11 @@ Content-Type: application/json
   "type": "DEPOSIT",
   "recipientAccount": "ACC-12345678",
   "recipientName": "John Doe",
-  "paymentReference": "Invoice 123",
-  "isDemoMode": false
+  "paymentReference": "Invoice 123"
 }
 ```
+
+> **Note:** Demo mode (instant transaction processing) is controlled by the server-side `app.demo-mode` configuration, not a client field.
 
 ## Database Schema
 
@@ -282,11 +305,23 @@ CREATE TABLE users (
 ### Wallet Balances Table
 ```sql
 CREATE TABLE wallet_balances (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     currency VARCHAR(3) NOT NULL,
     balance DECIMAL(20, 2) NOT NULL,
     last_updated TIMESTAMP WITH TIME ZONE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+### Refresh Tokens Table
+```sql
+CREATE TABLE refresh_tokens (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    token VARCHAR(512) UNIQUE NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 ```
@@ -312,8 +347,9 @@ CREATE TABLE transactions (
 
 ### Prerequisites
 - Node.js 20+
-- Java 17+
+- Java 21+
 - PostgreSQL 15+
+- Redis 7+
 - Docker and Docker Compose (optional)
 
 ### Installation
@@ -341,8 +377,12 @@ Backend (application.properties):
 spring.datasource.url=jdbc:postgresql://localhost:5432/wallet_db
 spring.datasource.username=your-username-here
 spring.datasource.password=your-password-here
-jwt.secret=your-secret-key-here
-jwt.expiration=86400000
+jwt.secret=your-secret-key-min-64-chars-here
+jwt.expiration=900000
+jwt.refresh-expiration=604800000
+jwt.issuer=digital-wallet-api
+jwt.audience=digital-wallet-client
+app.demo-mode=false
 ```
 
 4. Start development servers:
@@ -365,6 +405,7 @@ Set env variables in the docker-compose.yml:
  *  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_NAME
  *  SPRING_DATASOURCE_USERNAME
  *  SPRING_DATASOURCE_PASSWORD
+ *  SPRING_DATA_REDIS_HOST: redis
  
 Build images:
 ```bash
@@ -386,12 +427,14 @@ docker-compose up -d
 
 ```bash
 # Frontend
-npm run format      # Run Prettier
-npm run lint       # Run ESLint
+npm run format      # Run Biome formatter
+npm run lint       # Run Biome linter
 npm run typecheck  # Run TypeScript check
+npm run test       # Run tests
+npm run check-all  # Run format -> lint -> typecheck -> test in sequence
 
 # Backend
-./mvnw verify      # Run all checks
+./mvnw verify      # Run all checks and tests
 ```
 
 ## Contributing
