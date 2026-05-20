@@ -92,7 +92,7 @@ A modern digital wallet application built with Vue.js and Spring Boot.
     - Mix of letters and numbers recommended
     - Regular password changes recommended
 2. Account Protection:
-    - Never share your account reference
+    - Only share your account reference with trusted people
     - Keep your login credentials secure
     - Log out when using shared devices
 3. Transaction Safety:
@@ -348,7 +348,7 @@ CREATE TABLE transactions (
 ### Prerequisites
 - Node.js 20+
 - Java 21+
-- PostgreSQL 15+
+- PostgreSQL 16+
 - Redis 7+
 - Docker and Docker Compose (optional)
 
@@ -369,7 +369,13 @@ npm install
 
 Frontend (.env):
 ```env
+# Copy from packages/frontend/.env.example
 VITE_API_URL=http://localhost:8080/api
+```
+
+Or simply:
+```bash
+cp packages/frontend/.env.example packages/frontend/.env
 ```
 
 Backend (application.properties):
@@ -406,6 +412,9 @@ Set env variables in the docker-compose.yml:
  *  SPRING_DATASOURCE_USERNAME
  *  SPRING_DATASOURCE_PASSWORD
  *  SPRING_DATA_REDIS_HOST: redis
+ *  JWT_SECRET
+ *  APP_DEMO_MODE: false (default)
+ *  APP_CORS_ALLOWED_ORIGINS: http://localhost:5173 (default)
  
 Build images:
 ```bash

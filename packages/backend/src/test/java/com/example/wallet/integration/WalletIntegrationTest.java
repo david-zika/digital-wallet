@@ -5,6 +5,7 @@ import com.example.wallet.model.WalletBalance;
 import com.example.wallet.repository.UserRepository;
 import com.example.wallet.repository.WalletBalanceRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
@@ -34,16 +35,14 @@ class WalletIntegrationTest {
 
     @Container
     @ServiceConnection(name = "redis")
+    @SuppressWarnings("resource")
     static GenericContainer<?> redis =
             new GenericContainer<>(DockerImageName.parse("redis:7-alpine")).withExposedPorts(6379);
 
-    private final UserRepository userRepository;
-    private final WalletBalanceRepository walletBalanceRepository;
-
-    WalletIntegrationTest(UserRepository userRepository, WalletBalanceRepository walletBalanceRepository) {
-        this.userRepository = userRepository;
-        this.walletBalanceRepository = walletBalanceRepository;
-    }
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired UserRepository userRepository;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired WalletBalanceRepository walletBalanceRepository;
 
     @Test
     void flyway_shouldApplyAllMigrationsSuccessfully() {

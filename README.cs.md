@@ -92,7 +92,7 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
     - Doporučena kombinace písmen a čísel
     - Doporučena pravidelná změna hesla
 2. Ochrana účtu:
-    - Nikdy nesdílejte své referenční číslo účtu
+    - Sdílejte referenční číslo účtu pouze důvěryhodným osobám
     - Udržujte své přihlašovací údaje v bezpečí
     - Odhlaste se při používání sdílených zařízení
 3. Bezpečnost transakcí:
@@ -266,7 +266,7 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 1. Předpoklady
     - Node.js 20+
     - Java 21+
-    - PostgreSQL 15+
+    - PostgreSQL 16+
     - Redis 7+
     - Docker a Docker Compose
 
@@ -277,6 +277,9 @@ Moderní aplikace digitální peněženky postavená na Vue.js a Spring Boot.
 
    # Instalace závislostí
    npm install
+
+   # Nastavení frontendu – zkopírujte .env.example
+   cp packages/frontend/.env.example packages/frontend/.env
 
    # Spuštění vývojových serverů
    npm run dev
@@ -352,6 +355,9 @@ VITE_API_URL=http://localhost:8080/api
 *  SPRING_DATASOURCE_USERNAME
 *  SPRING_DATASOURCE_PASSWORD
 *  SPRING_DATA_REDIS_HOST: redis
+*  JWT_SECRET
+*  APP_DEMO_MODE: false (výchozí)
+*  APP_CORS_ALLOWED_ORIGINS: http://localhost:5173 (výchozí)
 
 1. Sestavení obrazů:
    ```bash

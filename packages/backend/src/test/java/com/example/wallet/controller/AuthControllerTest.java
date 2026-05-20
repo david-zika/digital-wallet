@@ -13,6 +13,7 @@ import com.example.wallet.service.CustomUserDetailsService;
 import com.example.wallet.service.port.AuthServicePort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,18 +37,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(GlobalExceptionHandler.class)
 class AuthControllerTest {
 
-    private final MockMvc mvc;
-    private final ObjectMapper objectMapper;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired MockMvc mvc;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired ObjectMapper objectMapper;
 
     @MockitoBean AuthServicePort authService;
     @MockitoBean JwtService jwtService;
     @MockitoBean CustomUserDetailsService customUserDetailsService;
     @MockitoBean org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
-    AuthControllerTest(MockMvc mvc, ObjectMapper objectMapper) {
-        this.mvc = mvc;
-        this.objectMapper = objectMapper;
-    }
 
     @Test
     void register_validRequest_returns201WithTokenPair() throws Exception {

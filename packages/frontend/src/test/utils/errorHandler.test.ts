@@ -14,11 +14,11 @@ describe('useErrorHandler', () => {
   const { handleError } = useErrorHandler()
 
   describe('handleError – Axios chyby', () => {
-    it('přeloží RECIPIENT_NOT_FOUND přes error code', () => {
+    it('přeloží RECIPIENT_NOT_FOUND přes title', () => {
       const axiosError = {
         isAxiosError: true,
         response: {
-          data: { code: 'RECIPIENT_NOT_FOUND', message: 'Recipient not found' },
+          data: { title: 'RECIPIENT_NOT_FOUND', detail: 'Recipient not found' },
         },
         message: 'Request failed',
       }
@@ -26,11 +26,11 @@ describe('useErrorHandler', () => {
       expect(result).toBe('errors.recipientNotFound')
     })
 
-    it('přeloží INSUFFICIENT_FUNDS přes error code', () => {
+    it('přeloží INSUFFICIENT_FUNDS přes title', () => {
       const axiosError = {
         isAxiosError: true,
         response: {
-          data: { code: 'INSUFFICIENT_FUNDS', message: 'Not enough money' },
+          data: { title: 'INSUFFICIENT_FUNDS', detail: 'Not enough money' },
         },
         message: 'Request failed',
       }
@@ -38,37 +38,37 @@ describe('useErrorHandler', () => {
       expect(result).toBe('errors.insufficientFunds')
     })
 
-    it('přeloží INVALID_AMOUNT přes error code', () => {
+    it('přeloží INVALID_AMOUNT přes title', () => {
       const axiosError = {
         isAxiosError: true,
-        response: { data: { code: 'INVALID_AMOUNT', message: 'Bad amount' } },
+        response: { data: { title: 'INVALID_AMOUNT', detail: 'Bad amount' } },
         message: 'Request failed',
       }
       expect(handleError(axiosError)).toBe('errors.invalidAmount')
     })
 
-    it('přeloží INVALID_CURRENCY přes error code', () => {
+    it('přeloží INVALID_CURRENCY přes title', () => {
       const axiosError = {
         isAxiosError: true,
-        response: { data: { code: 'INVALID_CURRENCY', message: 'Bad currency' } },
+        response: { data: { title: 'INVALID_CURRENCY', detail: 'Bad currency' } },
         message: 'Request failed',
       }
       expect(handleError(axiosError)).toBe('errors.invalidCurrency')
     })
 
-    it('přeloží TRANSACTION_FAILED přes error code', () => {
+    it('přeloží TRANSACTION_FAILED přes title', () => {
       const axiosError = {
         isAxiosError: true,
-        response: { data: { code: 'TRANSACTION_FAILED', message: 'Failed' } },
+        response: { data: { title: 'TRANSACTION_FAILED', detail: 'Failed' } },
         message: 'Request failed',
       }
       expect(handleError(axiosError)).toBe('errors.transactionFailed')
     })
 
-    it('vrátí message ze serveru, pokud code není v mapě', () => {
+    it('vrátí detail ze serveru, pokud title není v mapě', () => {
       const axiosError = {
         isAxiosError: true,
-        response: { data: { code: 'UNKNOWN_CODE', message: 'Server message' } },
+        response: { data: { title: 'UNKNOWN_CODE', detail: 'Server message' } },
         message: 'Request failed',
       }
       expect(handleError(axiosError)).toBe('Server message')
